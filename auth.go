@@ -65,6 +65,7 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user UserCredentials
+	enableCors(&w)
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
