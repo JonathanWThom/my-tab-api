@@ -33,7 +33,7 @@ func main() {
 
 	router.Handle("/drinks", negroni.New(
 		negroni.HandlerFunc(ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(getDrinksHandler)),
+		negroni.Wrap(http.HandlerFunc(createDrinkHandler)),
 	)).Methods("POST", "OPTIONS")
 
 	router.HandleFunc("/login", LoginHandler).Methods("POST")
