@@ -6,13 +6,8 @@ import (
 	"net/http"
 )
 
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-}
-
 func createDrinkHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	enableCors(&w)
 	var drink Drink
 
 	err := json.NewDecoder(r.Body).Decode(&drink)
@@ -39,7 +34,6 @@ func createDrinkHandler(w http.ResponseWriter, r *http.Request) {
 
 func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	enableCors(&w)
 
 	drinks, err := store.GetDrinks()
 	if err != nil {

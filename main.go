@@ -29,12 +29,12 @@ func main() {
 	router.Handle("/drinks", negroni.New(
 		negroni.HandlerFunc(ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(getDrinksHandler)),
-	)).Methods("GET")
+	)).Methods("GET", "OPTIONS")
 
 	router.Handle("/drinks", negroni.New(
 		negroni.HandlerFunc(ValidateTokenMiddleware),
 		negroni.Wrap(http.HandlerFunc(getDrinksHandler)),
-	)).Methods("POST")
+	)).Methods("POST", "OPTIONS")
 
 	router.HandleFunc("/login", LoginHandler).Methods("POST")
 

@@ -58,14 +58,18 @@ type Token struct {
 	Token string `json:"token"`
 }
 
-func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
-	response := Response{"Gained access to protected resource"}
-	JsonResponse(response, w)
+func setupResponse(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Authorization")
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
 	var user UserCredentials
-	enableCors(&w)
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -103,6 +107,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	setupResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
 	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
 		func(token *jwt.Token) (interface{}, error) {
 			return verifyKey, nil
