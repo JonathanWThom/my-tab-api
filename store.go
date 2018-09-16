@@ -21,6 +21,7 @@ type dbStore struct {
 func (store *dbStore) CreateUser(user *User) (*User, error) {
 	var uuid string
 	var username string
+	var id int
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 	if err != nil {
@@ -29,17 +30,21 @@ func (store *dbStore) CreateUser(user *User) (*User, error) {
 	sqlStatement := `
 		INSERT INTO users(username, password)
 		VALUES($1, $2)
-		RETURNING uuid, username
+		RETURNING uuid, username, id
 	`
 
 	/// should validate uniqueness of name
-	err = store.db.QueryRow(sqlStatement, user.Username, string(hashedPassword)).Scan(&uuid, &username)
+	err = store.db.QueryRow(
+		sqlStatement,
+		user.Username,
+		string(hashedPassword)).Scan(&uuid, &username, &id)
 	if err != nil {
 		return nil, err
 	}
 
 	user.UUID = uuid
 	user.Username = username
+	user.ID = id
 
 	return user, nil
 }
@@ -47,10 +52,10 @@ func (store *dbStore) CreateUser(user *User) (*User, error) {
 func (store *dbStore) LoginUser(user *User) (*User, error) {
 	storedUser := User{}
 
-	sqlStatement := `SELECT password, uuid FROM users WHERE username=$1;`
+	sqlStatement := `SELECT password, uuid, id FROM users WHERE username=$1;`
 
 	row := store.db.QueryRow(sqlStatement, user.Username)
-	err := row.Scan(&storedUser.Password, &storedUser.UUID)
+	err := row.Scan(&storedUser.Password, &storedUser.UUID, &storedUser.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,20 +69,21 @@ func (store *dbStore) LoginUser(user *User) (*User, error) {
 
 func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 	drink.Stddrink = stddrink.Calculate(drink.Percent, drink.Oz)
-	var id int
+	var id, dbUserID int
 	var percent, oz, stddrink float64
 	var imbibedOn time.Time
 
 	sqlStatement := `
-		INSERT INTO drinks(percent, oz, stddrink, imbibed_on)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id, percent, oz, stddrink, imbibed_on`
+		INSERT INTO drinks(percent, oz, stddrink, imbibed_on, user_id)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, percent, oz, stddrink, imbibed_on, user_id`
 
 	err := store.db.QueryRow(sqlStatement,
 		drink.Percent,
 		drink.Oz,
 		drink.Stddrink,
-		drink.ImbibedOn).Scan(&id, &percent, &oz, &stddrink, &imbibedOn)
+		drink.ImbibedOn,
+		userID).Scan(&id, &percent, &oz, &stddrink, &imbibedOn, &dbUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +93,7 @@ func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 	drink.Oz = oz
 	drink.Stddrink = stddrink
 	drink.ImbibedOn = imbibedOn
+	drink.UserID = dbUserID
 	return drink, err
 }
 

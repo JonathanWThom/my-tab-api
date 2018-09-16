@@ -56,6 +56,8 @@ func setupResponse(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Headers", "Authorization")
 }
 
+var userID interface{}
+
 func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	setupResponse(&w, r)
 	if (*r).Method == http.MethodOptions {
@@ -67,8 +69,8 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 			return verifyKey, nil
 		})
 
-	claimz := token.Claims.(jwt.MapClaims)
-	fmt.Println(claimz)
+	claims := token.Claims.(jwt.MapClaims)
+	userID = claims["userID"].(float64)
 
 	if err == nil {
 		if token.Valid {

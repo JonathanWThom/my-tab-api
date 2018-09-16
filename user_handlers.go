@@ -61,13 +61,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func createJWTToken(user *User, w http.ResponseWriter) {
 	signer := jwt.New(jwt.GetSigningMethod("RS256"))
+
 	claims := make(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1))
 	claims["iat"] = time.Now().Unix()
-	claims["user_uuid"] = user.UUID
+	claims["userID"] = user.ID
 	signer.Claims = claims
-	tokenString, err := signer.SignedString(signKey)
 
+	tokenString, err := signer.SignedString(signKey)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, "Error while signing the token")

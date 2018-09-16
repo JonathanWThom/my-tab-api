@@ -18,6 +18,7 @@ CREATE TABLE users (
 );
 
 CREATE UNIQUE INDEX users_pkey ON users(id int4_ops);
+CREATE UNIQUE INDEX drinks_pkey ON drinks(id int4_ops);
 CREATE UNIQUE INDEX users_username_key ON users(username text_ops);
 CREATE INDEX index_drinks_on_user_id ON drinks(user_id int4_ops);
 CREATE UNIQUE INDEX users_uuid ON users(uuid uuid_ops);

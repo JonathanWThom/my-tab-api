@@ -8,4 +8,5 @@ type Drink struct {
 	Oz        float64   `json:"oz,string"`
 	Stddrink  float64   `json:"stddrink"`
 	ImbibedOn time.Time `json:"imbibedOn"`
+	UserID    int       `json:"user_id"`
 }
