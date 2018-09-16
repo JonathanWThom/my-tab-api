@@ -74,7 +74,6 @@ func createJWTToken(user *User, w http.ResponseWriter) {
 		log.Printf("Error signing token: %v\n", err)
 	}
 
-	// SHOULD THIS RETURN USER?
 	response := Token{tokenString}
 	JsonResponse(response, w)
 }

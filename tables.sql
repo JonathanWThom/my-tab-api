@@ -4,6 +4,7 @@ CREATE TABLE drinks (
   percent NUMERIC NOT NULL,
   stddrink NUMERIC NOT NULL,
   imbibed_on TIMESTAMPTZ NOT NULL
+  user_id integer REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
   --- NEEDS USER FOREIGN KEY REFERENCE ---
 );
 
@@ -18,3 +19,5 @@ CREATE TABLE users (
 
 CREATE UNIQUE INDEX users_pkey ON users(id int4_ops);
 CREATE UNIQUE INDEX users_username_key ON users(username text_ops);
+CREATE INDEX index_drinks_on_user_id ON drinks(user_id int4_ops);
+CREATE UNIQUE INDEX users_uuid ON users(uuid uuid_ops);
