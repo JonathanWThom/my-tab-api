@@ -3,16 +3,42 @@ package main
 import (
 	"database/sql"
 	"github.com/jonathanwthom/my-tab-api/stddrink"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
 type Store interface {
+	CreateUser(user *User) (*User, error)
 	CreateDrink(drink *Drink) (*Drink, error)
 	GetDrinks() ([]*Drink, error)
 }
 
 type dbStore struct {
 	db *sql.DB
+}
+
+func (store *dbStore) CreateUser(user *User) (*User, error) {
+	var id int
+	var username string
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
+	if err != nil {
+		return nil, err
+	}
+	sqlStatement := `
+		INSERT INTO users(username, password)
+		VALUES($1, $2)
+		RETURNING id, username
+	`
+	err = store.db.QueryRow(sqlStatement, user.Username, string(hashedPassword)).Scan(&id, &username)
+	if err != nil {
+		return nil, err
+	}
+
+	user.ID = id
+	user.Username = username
+
+	return user, nil
 }
 
 func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {

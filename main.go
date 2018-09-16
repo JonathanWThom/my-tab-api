@@ -36,6 +36,7 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(createDrinkHandler)),
 	)).Methods("POST", "OPTIONS")
 
+	router.HandleFunc("/signup", SignUpHandler).Methods("POST")
 	router.HandleFunc("/login", LoginHandler).Methods("POST")
 
 	fmt.Println("Now serving on port 8000")
