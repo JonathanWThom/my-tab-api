@@ -29,8 +29,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Do we need to create a json token here?
-	JsonResponse(createdUser, w)
+	createJWTToken(createdUser, w)
 }
 
 // LoginHandler is routed from POST /login
@@ -57,6 +56,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	createJWTToken(&user, w)
+}
+
+func createJWTToken(user *User, w http.ResponseWriter) {
 	signer := jwt.New(jwt.GetSigningMethod("RS256"))
 	claims := make(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1))
