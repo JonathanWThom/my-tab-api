@@ -98,7 +98,12 @@ func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 }
 
 func (store *dbStore) GetDrinks() ([]*Drink, error) {
-	rows, err := store.db.Query("SELECT id, percent, oz, stddrink, imbibed_on FROM drinks")
+	sqlStatement := `
+		SELECT id, percent, oz, stddrink, imbibed_on
+		FROM drinks
+		WHERE user_id = $1
+	`
+	rows, err := store.db.Query(sqlStatement, userID)
 	if err != nil {
 		return nil, err
 	}
