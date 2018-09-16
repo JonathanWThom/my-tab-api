@@ -11,6 +11,7 @@ type Store interface {
 	CreateUser(user *User) (*User, error)
 	CreateDrink(drink *Drink) (*Drink, error)
 	GetDrinks() ([]*Drink, error)
+	LoginUser(user *User) error
 }
 
 type dbStore struct {
@@ -30,6 +31,8 @@ func (store *dbStore) CreateUser(user *User) (*User, error) {
 		VALUES($1, $2)
 		RETURNING id, username
 	`
+
+	/// should validate uniqueness of name
 	err = store.db.QueryRow(sqlStatement, user.Username, string(hashedPassword)).Scan(&id, &username)
 	if err != nil {
 		return nil, err
@@ -39,6 +42,24 @@ func (store *dbStore) CreateUser(user *User) (*User, error) {
 	user.Username = username
 
 	return user, nil
+}
+
+func (store *dbStore) LoginUser(user *User) error {
+	storedUser := User{}
+
+	sqlStatement := `SELECT password FROM users WHERE username=$1;`
+
+	row := store.db.QueryRow(sqlStatement, user.Username)
+	err := row.Scan(&storedUser.Password)
+	if err != nil {
+		return err
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(user.Password)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {

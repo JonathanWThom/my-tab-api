@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
@@ -57,52 +55,9 @@ func setupResponse(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Headers", "Authorization")
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	setupResponse(&w, r)
-	if (*r).Method == "OPTIONS" {
-		return
-	}
-
-	var user User
-
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintf(w, "Error in request")
-		return
-	}
-
-	if strings.ToLower(user.Username) != "jonathan" {
-		if user.Password != "123123" {
-			w.WriteHeader(http.StatusForbidden)
-			fmt.Println("Error logging in")
-			fmt.Fprintf(w, "Invalid credentials")
-			return
-		}
-	}
-
-	signer := jwt.New(jwt.GetSigningMethod("RS256"))
-
-	claims := make(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1))
-	claims["iat"] = time.Now().Unix()
-	signer.Claims = claims
-
-	tokenString, err := signer.SignedString(signKey)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Error while signing the token")
-		log.Printf("Error signing token: %v\n", err)
-	}
-
-	response := Token{tokenString}
-	JsonResponse(response, w)
-}
-
 func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	setupResponse(&w, r)
-	if (*r).Method == "OPTIONS" {
+	if (*r).Method == http.MethodOptions {
 		return
 	}
 
