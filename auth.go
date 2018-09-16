@@ -40,6 +40,7 @@ type User struct {
 	ID       int    `json:"id" db:"id"`
 	Username string `json:"username" db:"username"`
 	Password string `json:"password" db:"password"`
+	UUID     string `json:"uuid" db:"uuid"`
 }
 
 type Response struct {
@@ -65,6 +66,9 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 		func(token *jwt.Token) (interface{}, error) {
 			return verifyKey, nil
 		})
+
+	claimz := token.Claims.(jwt.MapClaims)
+	fmt.Println(claimz)
 
 	if err == nil {
 		if token.Valid {

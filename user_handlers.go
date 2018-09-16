@@ -48,7 +48,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = store.LoginUser(&user)
+	storedUser, err := store.LoginUser(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Println("Error logging in")
@@ -56,7 +56,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createJWTToken(&user, w)
+	createJWTToken(storedUser, w)
 }
 
 func createJWTToken(user *User, w http.ResponseWriter) {
@@ -64,7 +64,7 @@ func createJWTToken(user *User, w http.ResponseWriter) {
 	claims := make(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1))
 	claims["iat"] = time.Now().Unix()
-	claims["user"] = user
+	claims["user_uuid"] = user.UUID
 	signer.Claims = claims
 	tokenString, err := signer.SignedString(signKey)
 
