@@ -10,3 +10,10 @@ type Drink struct {
 	ImbibedOn time.Time `json:"imbibedOn"`
 	UserID    int       `json:"user_id"`
 }
+
+// DrinksMetadata stores an array of drinks plus cumulative metadata about all returned drinks
+type DrinksMetadata struct {
+	Drinks          []Drink `json:"drinks"`
+	StddrinksPerDay float64 `json:"stddrinks_per_day"`
+	TotalStddrinks  float64 `json:"total_stdddrinks"`
+}

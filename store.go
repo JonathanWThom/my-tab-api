@@ -103,7 +103,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 
 	if start == "" || end == "" {
 		sqlStatement := `
-			SELECT id, percent, oz, stddrink, imbibed_on
+			SELECT id, percent, oz, stddrink, imbibed_on, user_id
 			FROM drinks
 			WHERE user_id = $1
 		`
