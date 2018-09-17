@@ -10,8 +10,7 @@ import (
 type Store interface {
 	CreateDrink(drink *Drink) (*Drink, error)
 	CreateUser(user *User) (*User, error)
-	GetDrinks() ([]*Drink, error)
-	GetDrinksByDateRange(start, end time.Time) ([]*Drink, error)
+	GetDrinks(start, end string) ([]*Drink, error)
 	LoginUser(user *User) (*User, error)
 }
 
@@ -98,58 +97,51 @@ func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 	return drink, err
 }
 
-func (store *dbStore) GetDrinks() ([]*Drink, error) {
-	sqlStatement := `
-		SELECT id, percent, oz, stddrink, imbibed_on
-		FROM drinks
-		WHERE user_id = $1
-	`
-	rows, err := store.db.Query(sqlStatement, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
+	var rows *sql.Rows
+	var err error
 
-	drinks := []*Drink{}
-	for rows.Next() {
-		drink := &Drink{}
-		if err := rows.Scan(&drink.ID, &drink.Percent, &drink.Oz, &drink.Stddrink, &drink.ImbibedOn); err != nil {
+	if start == "" || end == "" {
+		sqlStatement := `
+			SELECT id, percent, oz, stddrink, imbibed_on
+			FROM drinks
+			WHERE user_id = $1
+		`
+		rows, err = store.db.Query(sqlStatement, userID)
+	} else {
+		layout := "2006-01-02T15:04:05.000Z"
+
+		stringTimes := [2]string{start, end}
+		realTimes := []time.Time{}
+		for _, stringTime := range stringTimes {
+			convTime, err := time.Parse(layout, stringTime)
+			if err != nil {
+				return nil, err
+			}
+			realTimes = append(realTimes, convTime)
+		}
+
+		if err != nil {
 			return nil, err
 		}
 
-		drinks = append(drinks, drink)
+		sqlStatement := `
+			SELECT id, percent, oz, stddrink, imbibed_on, user_id
+			FROM drinks
+			WHERE imbibed_on
+			BETWEEN $1 AND $2
+			AND
+			user_id = $3
+		`
+		rows, err = store.db.Query(sqlStatement, realTimes[0], realTimes[1], userID)
 	}
 
-	return drinks, nil
-}
-
-func (store *dbStore) GetDrinksByDateRange(start, end time.Time) ([]*Drink, error) {
-	// start := time.Date(2000, 2, 1, 12, 30, 0, 0, time.UTC)
-	// end := time.Now()
-	// drinks, err := store.GetDrinksByDateRange(start, end)
-	//
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	//
-	// fmt.Println(drinks)
-
-	sqlStatement := `
-		SELECT id, percent, oz, stddrink, imbibed_on
-		FROM drinks
-		WHERE imbibed_on
-		BETWEEN $1 AND $2
-	`
-	/// by user_id
-	rows, err := store.db.Query(sqlStatement, start, end)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	drinks := []*Drink{}
-
 	for rows.Next() {
 		drink := &Drink{}
 		if err := rows.Scan(
@@ -157,7 +149,8 @@ func (store *dbStore) GetDrinksByDateRange(start, end time.Time) ([]*Drink, erro
 			&drink.Percent,
 			&drink.Oz,
 			&drink.Stddrink,
-			&drink.ImbibedOn); err != nil {
+			&drink.ImbibedOn,
+			&drink.UserID); err != nil {
 			return nil, err
 		}
 

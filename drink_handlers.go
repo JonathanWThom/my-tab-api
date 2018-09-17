@@ -32,10 +32,15 @@ func createDrinkHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonDrink)
 }
 
+// getDrinksHandler - GET /drinks
+// can receive start and end time params
 func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	drinks, err := store.GetDrinks()
+	start := r.URL.Query().Get("start")
+	end := r.URL.Query().Get("end")
+
+	drinks, err := store.GetDrinks(start, end)
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
