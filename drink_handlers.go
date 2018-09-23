@@ -49,27 +49,29 @@ func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	drinksSlice := Drinks(drinks)
-	stddrinkList := drinksSlice.StddrinkList()
-	var times []time.Time
-	if start == "" || end == "" {
-		times = drinksSlice.FirstLastTimes()
-	} else {
-		times, err = stringsToTimes([]string{start, end})
-	}
+	metadata := NewDrinksMetadata()
 
-	if err != nil {
-		fmt.Fprintf(w, err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	perDay := stddrink.StddrinksPerDay(times[0], times[1], stddrinkList)
-	total := stddrink.TotalStdDrinks(stddrinkList)
+	if len(drinks) > 0 {
+		drinksSlice := Drinks(drinks)
+		stddrinkList := drinksSlice.StddrinkList()
+		var times []time.Time
+		if start == "" || end == "" {
+			times = drinksSlice.FirstLastTimes()
+		} else {
+			times, err = stringsToTimes([]string{start, end})
+		}
 
-	metadata := DrinksMetadata{
-		Drinks:          drinks,
-		StddrinksPerDay: perDay,
-		TotalStddrinks:  total,
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		perDay := stddrink.StddrinksPerDay(times[0], times[1], stddrinkList)
+		total := stddrink.TotalStdDrinks(stddrinkList)
+
+		metadata.Drinks = drinks
+		metadata.StddrinksPerDay = perDay
+		metadata.TotalStddrinks = total
 	}
 
 	drinkMetadataBytes, err := json.Marshal(metadata)

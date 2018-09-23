@@ -18,6 +18,12 @@ type DrinksMetadata struct {
 	TotalStddrinks  float64  `json:"total_stddrinks"`
 }
 
+func NewDrinksMetadata() DrinksMetadata {
+	metadata := DrinksMetadata{Drinks: []*Drink{}}
+
+	return metadata
+}
+
 // Drinks is an array of Drink pointers
 type Drinks []*Drink
 
