@@ -16,6 +16,10 @@ func StddrinksPerDay(start, end time.Time, stddrinks []float64) float64 {
 	total := TotalStdDrinks(stddrinks)
 	diff := end.Sub(start).Hours() / 24
 
+	if diff == 0 {
+		diff = 1
+	}
+
 	return total / float64(diff)
 }
 

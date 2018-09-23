@@ -33,7 +33,7 @@ func (store *dbStore) CreateUser(user *User) (*User, error) {
 		RETURNING uuid, username, id
 	`
 
-	/// should validate uniqueness of name
+	// TODO: Should validate uniqueness of name
 	err = store.db.QueryRow(
 		sqlStatement,
 		user.Username,
@@ -106,21 +106,11 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 			SELECT id, percent, oz, stddrink, imbibed_on, user_id
 			FROM drinks
 			WHERE user_id = $1
+			ORDER BY imbibed_on
 		`
 		rows, err = store.db.Query(sqlStatement, userID)
 	} else {
-		layout := "2006-01-02T15:04:05.000Z"
-
-		stringTimes := [2]string{start, end}
-		realTimes := []time.Time{}
-		for _, stringTime := range stringTimes {
-			convTime, err := time.Parse(layout, stringTime)
-			if err != nil {
-				return nil, err
-			}
-			realTimes = append(realTimes, convTime)
-		}
-
+		times, err := stringsToTimes([]string{start, end})
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +123,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 			AND
 			user_id = $3
 		`
-		rows, err = store.db.Query(sqlStatement, realTimes[0], realTimes[1], userID)
+		rows, err = store.db.Query(sqlStatement, times[0], times[1], userID)
 	}
 
 	if err != nil {

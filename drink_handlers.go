@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jonathanwthom/my-tab-api/stddrink"
 	"net/http"
+	"time"
 )
 
 func createDrinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,12 +49,35 @@ func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	drinkListBytes, err := json.Marshal(drinks)
+	drinksSlice := Drinks(drinks)
+	stddrinkList := drinksSlice.StddrinkList()
+	var times []time.Time
+	if start == "" || end == "" {
+		times = drinksSlice.FirstLastTimes()
+	} else {
+		times, err = stringsToTimes([]string{start, end})
+	}
+
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	perDay := stddrink.StddrinksPerDay(times[0], times[1], stddrinkList)
+	total := stddrink.TotalStdDrinks(stddrinkList)
+
+	metadata := DrinksMetadata{
+		Drinks:          drinks,
+		StddrinksPerDay: perDay,
+		TotalStddrinks:  total,
+	}
+
+	drinkMetadataBytes, err := json.Marshal(metadata)
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.Write(drinkListBytes)
+	w.Write(drinkMetadataBytes)
 }
