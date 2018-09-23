@@ -15,7 +15,7 @@ type Drink struct {
 type DrinksMetadata struct {
 	Drinks          []*Drink `json:"drinks"`
 	StddrinksPerDay float64  `json:"stddrinks_per_day"`
-	TotalStddrinks  float64  `json:"total_stdddrinks"`
+	TotalStddrinks  float64  `json:"total_stddrinks"`
 }
 
 // Drinks is an array of Drink pointers
