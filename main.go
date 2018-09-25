@@ -7,10 +7,15 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"net/http"
+	"os"
 )
 
 func main() {
 	fmt.Println("Starting server...")
+	addr, err := determineListenAddress()
+	if err != nil {
+		panic(err)
+	}
 	initKeys()
 	connServer := "dbname=my_tab sslmode=disable"
 	db, err := sql.Open("postgres", connServer)
@@ -41,5 +46,13 @@ func main() {
 
 	fmt.Println("Now serving on port 8000")
 
-	http.ListenAndServe(":8000", router)
+	http.ListenAndServe(addr, router)
+}
+
+func determineListenAddress() (string, error) {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
+	return ":" + port, nil
 }
