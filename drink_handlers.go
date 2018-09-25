@@ -43,6 +43,7 @@ func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 	end := r.URL.Query().Get("end")
 
 	drinks, err := store.GetDrinks(start, end)
+
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

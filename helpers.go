@@ -7,7 +7,7 @@ func stringsToTimes(strings []string) ([]time.Time, error) {
 	realTimes := []time.Time{}
 
 	for _, stringTime := range strings {
-		convTime, err := time.Parse(layout, stringTime)
+		convTime, err := time.Parse(layout, stringTime+"T00:00:00.000Z")
 		if err != nil {
 			return nil, err
 		}
