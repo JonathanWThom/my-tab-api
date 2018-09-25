@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 	initKeys()
-	connServer := "dbname=my_tab sslmode=disable"
+	connServer := determineDbUrl()
 	db, err := sql.Open("postgres", connServer)
 	if err != nil {
 		panic(err)
@@ -55,4 +55,13 @@ func determineListenAddress() (string, error) {
 		port = "8000"
 	}
 	return ":" + port, nil
+}
+
+func determineDbUrl() string {
+	url := os.Getenv("DATABASE_URL")
+	if url == "" {
+		return "dbname=my_tab sslmode=disable"
+	} else {
+		return url
+	}
 }
