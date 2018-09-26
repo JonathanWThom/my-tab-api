@@ -39,12 +39,12 @@ func initKeys() {
 	if os.Getenv("PORT") == "" {
 		verifyKeyByte, err = ioutil.ReadFile(pubKeyPath)
 	} else {
-		signKeyByte = []byte(os.Getenv("PUBLIC_KEY"))
+		verifyKeyByte = []byte(os.Getenv("PUBLIC_KEY"))
 	}
 
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyKeyByte)
 	if err != nil {
-		log.Fatalf("[publicyKey]: %s\n", err)
+		log.Fatalf("[publicKey]: %s\n", err)
 		panic(err)
 	}
 }
