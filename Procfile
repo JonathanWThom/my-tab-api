@@ -1,1 +1,1 @@
-web: ./my-tap-api
+web: my-tap-api
