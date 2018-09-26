@@ -10,6 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
+	"os"
 )
 
 const (
@@ -22,13 +23,25 @@ var signKey *rsa.PrivateKey
 
 func initKeys() {
 	var err error
-	signKeyByte, err := ioutil.ReadFile(privKeyPath)
+	var signKeyByte []byte
+	if os.Getenv("PORT") == "" {
+		signKeyByte, err = ioutil.ReadFile(privKeyPath)
+	} else {
+		signKeyByte = []byte(os.Getenv("PRIVATE_KEY"))
+	}
+
 	signKey, err = jwt.ParseRSAPrivateKeyFromPEM(signKeyByte)
 	if err != nil {
 		log.Fatalf("[privateKey]: %s\n", err)
 	}
 
-	verifyKeyByte, err := ioutil.ReadFile(pubKeyPath)
+	var verifyKeyByte []byte
+	if os.Getenv("PORT") == "" {
+		verifyKeyByte, err = ioutil.ReadFile(pubKeyPath)
+	} else {
+		signKeyByte = []byte(os.Getenv("PUBLIC_KEY"))
+	}
+
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyKeyByte)
 	if err != nil {
 		log.Fatalf("[publicyKey]: %s\n", err)
