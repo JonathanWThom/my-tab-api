@@ -1,1 +1,1 @@
-web: my-tap-api
+web: my-tab-api
