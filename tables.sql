@@ -1,13 +1,3 @@
-CREATE TABLE drinks (
-  id serial PRIMARY KEY,
-  oz NUMERIC NOT NULL,
-  percent NUMERIC NOT NULL,
-  stddrink NUMERIC NOT NULL,
-  imbibed_on TIMESTAMPTZ NOT NULL
-  user_id integer REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
-  --- NEEDS USER FOREIGN KEY REFERENCE ---
-);
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
@@ -15,6 +5,16 @@ CREATE TABLE users (
     username text NOT NULL UNIQUE,
     password text NOT NULL,
     uuid uuid NOT NULL DEFAULT uuid_generate_v4()
+);
+
+CREATE TABLE drinks (
+  id serial PRIMARY KEY,
+  oz NUMERIC NOT NULL,
+  percent NUMERIC NOT NULL,
+  stddrink NUMERIC NOT NULL,
+  imbibed_on TIMESTAMPTZ NOT NULL,
+  user_id integer REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+  --- NEEDS USER FOREIGN KEY REFERENCE ---
 );
 
 CREATE UNIQUE INDEX users_pkey ON users(id int4_ops);
