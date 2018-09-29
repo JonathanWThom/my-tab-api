@@ -10,6 +10,7 @@ import (
 type Store interface {
 	CreateDrink(drink *Drink) (*Drink, error)
 	CreateUser(user *User) (*User, error)
+	DeleteDrink(id string) error
 	GetDrinks(start, end string) ([]*Drink, error)
 	LoginUser(user *User) (*User, error)
 }
@@ -148,6 +149,20 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 	}
 
 	return drinks, nil
+}
+
+func (store *dbStore) DeleteDrink(id string) error {
+	sqlStatement := `
+		DELETE FROM drinks
+		WHERE id = $1
+		AND user_id = $2
+	`
+	_, err := store.db.Query(sqlStatement, id, userID)
+	if err != nil {
+		return err
+	}
+	// should something be returned here?
+	return nil
 }
 
 var store Store

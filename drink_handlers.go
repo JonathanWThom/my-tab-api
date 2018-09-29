@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/jonathanwthom/my-tab-api/stddrink"
 	"net/http"
 	"time"
@@ -83,4 +84,20 @@ func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(drinkMetadataBytes)
+}
+
+// DELETE /drinks/{id}
+func deleteDrinkHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := store.DeleteDrink(id)
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// should a resource return here?
+	w.WriteHeader(http.StatusOK)
 }

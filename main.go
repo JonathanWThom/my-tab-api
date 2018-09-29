@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 	initKeys()
-	connServer := determineDbUrl()
+	connServer := determineDbURl()
 	db, err := sql.Open("postgres", connServer)
 	if err != nil {
 		panic(err)
@@ -41,6 +41,11 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(createDrinkHandler)),
 	)).Methods("POST", "OPTIONS")
 
+	router.Handle("/drinks/{id}", negroni.New(
+		negroni.HandlerFunc(ValidateTokenMiddleware),
+		negroni.Wrap(http.HandlerFunc(deleteDrinkHandler)),
+	)).Methods("DELETE", "OPTIONS")
+
 	router.HandleFunc("/signup", SignUpHandler).Methods("POST")
 	router.HandleFunc("/login", LoginHandler).Methods("POST")
 
@@ -57,7 +62,7 @@ func determineListenAddress() (string, error) {
 	return ":" + port, nil
 }
 
-func determineDbUrl() string {
+func determineDbURl() string {
 	url := os.Getenv("DATABASE_URL")
 	if url == "" {
 		return "dbname=my_tab sslmode=disable"
