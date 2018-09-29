@@ -64,6 +64,11 @@ If you wanted to run this locally, you'd need the following:
 - [Postgresql](https://www.postgresql.org/). Create the `my_tab` database and add
 the tables included in `tables.sql`.
 
+### Todo and Known Bugs
+
+* More test coverage
+* Dates are returned the client as the day before what was entered.
+
 ### License
 
 MIT
