@@ -162,7 +162,7 @@ func (store *dbStore) DeleteDrink(id string) error {
 		return err
 	}
 	// should something be returned here?
-	return nil
+	return err
 }
 
 var store Store

@@ -98,6 +98,5 @@ func deleteDrinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// should a resource return here?
 	w.WriteHeader(http.StatusOK)
 }
