@@ -107,7 +107,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 			SELECT id, percent, oz, stddrink, imbibed_on, user_id
 			FROM drinks
 			WHERE user_id = $1
-			ORDER BY imbibed_on
+			ORDER BY imbibed_on DESC
 		`
 		rows, err = store.db.Query(sqlStatement, userID)
 	} else {
@@ -123,6 +123,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 			BETWEEN $1 AND $2
 			AND
 			user_id = $3
+			ORDER BY imbibed_on DESC
 		`
 		rows, err = store.db.Query(sqlStatement, times[0], times[1], userID)
 	}
