@@ -68,7 +68,7 @@ func getDrinksHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		perDay := stddrink.StddrinksPerDay(times[0], times[1], stddrinkList)
+		perDay := stddrink.StddrinksPerDay(times[1], times[0], stddrinkList)
 		total := stddrink.TotalStdDrinks(stddrinkList)
 
 		metadata.Drinks = drinks
