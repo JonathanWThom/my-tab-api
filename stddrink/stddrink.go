@@ -1,6 +1,7 @@
 package stddrink
 
 import (
+	"math"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func StddrinksPerDay(start, end time.Time, stddrinks []float64) float64 {
 		diff = 1
 	}
 
-	return total / float64(diff)
+	return math.Abs(total / float64(diff))
 }
 
 // TotalStdDrinks adds standard drinks (or rather, floats)
