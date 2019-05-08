@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 type Drink struct {
 	ID        int       `json:"id"`

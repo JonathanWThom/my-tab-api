@@ -73,18 +73,20 @@ func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 	var id, dbUserID int
 	var percent, oz, stddrink float64
 	var imbibedOn time.Time
+	var name sql.NullString
 
 	sqlStatement := `
-		INSERT INTO drinks(percent, oz, stddrink, imbibed_on, user_id)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, percent, oz, stddrink, imbibed_on, user_id`
+		INSERT INTO drinks(percent, oz, stddrink, imbibed_on, user_id, name)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id, percent, oz, stddrink, imbibed_on, user_id, name`
 
 	err := store.db.QueryRow(sqlStatement,
 		drink.Percent,
 		drink.Oz,
 		drink.Stddrink,
 		drink.ImbibedOn,
-		userID).Scan(&id, &percent, &oz, &stddrink, &imbibedOn, &dbUserID)
+		userID,
+		drink.Name).Scan(&id, &percent, &oz, &stddrink, &imbibedOn, &dbUserID, &name)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +97,9 @@ func (store *dbStore) CreateDrink(drink *Drink) (*Drink, error) {
 	drink.Stddrink = stddrink
 	drink.ImbibedOn = imbibedOn
 	drink.UserID = dbUserID
+	if name.Valid {
+		drink.Name = name.String
+	}
 	return drink, err
 }
 
@@ -136,16 +141,21 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 	drinks := []*Drink{}
 	for rows.Next() {
 		drink := &Drink{}
+		var name sql.NullString
 		if err := rows.Scan(
 			&drink.ID,
 			&drink.Percent,
 			&drink.Oz,
 			&drink.Stddrink,
 			&drink.ImbibedOn,
-			&drink.UserID); err != nil {
+			&drink.UserID,
+			&name); err != nil {
 			return nil, err
 		}
 
+		if name.Valid {
+			drink.Name = name.String
+		}
 		drinks = append(drinks, drink)
 	}
 
