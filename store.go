@@ -104,7 +104,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 
 	if start == "" || end == "" {
 		sqlStatement := `
-			SELECT id, percent, oz, stddrink, imbibed_on, user_id
+			SELECT id, percent, oz, stddrink, imbibed_on, user_id, name
 			FROM drinks
 			WHERE user_id = $1
 			ORDER BY imbibed_on DESC
@@ -117,7 +117,7 @@ func (store *dbStore) GetDrinks(start, end string) ([]*Drink, error) {
 		}
 
 		sqlStatement := `
-			SELECT id, percent, oz, stddrink, imbibed_on, user_id
+			SELECT id, percent, oz, stddrink, imbibed_on, user_id, name
 			FROM drinks
 			WHERE imbibed_on
 			BETWEEN $1 AND $2

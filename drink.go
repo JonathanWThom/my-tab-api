@@ -9,6 +9,7 @@ type Drink struct {
 	Stddrink  float64   `json:"stddrink"`
 	ImbibedOn time.Time `json:"imbibedOn"`
 	UserID    int       `json:"user_id"`
+	Name      string    `json:"name"`
 }
 
 // DrinksMetadata stores an array of drinks plus cumulative metadata about all returned drinks
